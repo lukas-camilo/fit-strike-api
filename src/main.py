@@ -3,7 +3,7 @@ from aws_lambda_powertools.logging import Logger
 from aws_lambda_powertools.tracing import Tracer
 from aws_lambda_powertools.metrics import Metrics
 
-from interface_adapters.controllers.product_controller import register_product_routes
+from src.interface_adapters.controllers.product_controller import register_product_routes
 
 # Initialize Powertools utilities
 logger = Logger()
