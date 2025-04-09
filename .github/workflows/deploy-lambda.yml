@@ -23,21 +23,25 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
-    # 3. Instalar dependências
+    # 3. Instalar dependências na pasta package
     - name: Install dependencies
       run: |
-        pip install -r src/requirements.txt -t .
+        mkdir package
+        pip install -r src/requirements.txt -t package/
 
-    # 4. Empacotar o código
+    # 4. Copiar o código-fonte para a pasta package
+    - name: Copy source code
+      run: |
+        cp -r src/* package/
+
+    # 5. Empacotar o código e dependências
     - name: Package Lambda
       run: |
-        mkdir package
-        cp -r src/* package/
         cd package
         zip -r ../lambda_function.zip .
         cd ..
 
-    # 5. Fazer o deploy da Lambda
+    # 6. Fazer o deploy da Lambda
     - name: Deploy Lambda
       run: |
         aws lambda update-function-code \
