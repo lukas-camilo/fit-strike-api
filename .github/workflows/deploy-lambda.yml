@@ -27,12 +27,12 @@ jobs:
     - name: Install dependencies
       run: |
         mkdir package
-        pip install -r src/requirements.txt -t package/
+        pip install -r app/requirements.txt -t package/
 
     # 4. Copiar o código-fonte para a pasta package
     - name: Copy source code
       run: |
-        cp -r src/* package/
+        cp -r app/* package/
 
     # 5. Empacotar o código e dependências
     - name: Package Lambda
