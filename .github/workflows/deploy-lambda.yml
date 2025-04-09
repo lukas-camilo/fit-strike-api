@@ -3,45 +3,34 @@ name: Deploy Lambda
 on:
   push:
     branches:
-      - main  # Executa o deploy ao fazer push na branch main
+      - main
 
 jobs:
   deploy:
-    name: Deploy Lambda to AWS
     runs-on: ubuntu-latest
-
     steps:
-    # 1. Checkout do código
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # 2. Configurar o AWS CLI
-    - name: Configure AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
 
-    # 3. Instalar dependências
-    - name: Install dependencies
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install -r src/requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install aws-lambda-powertools -t .
+          pip install -r requirements.txt -t .
 
-    # 4. Empacotar o código
-    - name: Package Lambda
-      run: |
-        mkdir package
-        cp -r src/* package/
-        cd package
-        zip -r ../lambda_function.zip .
-        cd ..
+      - name: Package Lambda
+        run: zip -r lambda_function.zip .
 
-    # 5. Fazer o deploy da Lambda
-    - name: Deploy Lambda
-      run: |
-        aws lambda update-function-code \
-          --function-name fit-strike-api \
-          --zip-file fileb://lambda_function.zip
+      - name: Deploy to AWS Lambda
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          aws lambda update-function-code \
+            --function-name <NOME_DA_FUNÇÃO> \
+            --zip-file fileb://lambda_function.zip
