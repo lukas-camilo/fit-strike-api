@@ -37,30 +37,15 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 # Função Lambda com versionamento
 resource "aws_lambda_function" "my_lambda" {
-  function_name    = "fit-strike-api"
+  function_name    = var.lambda_name
   role             = aws_iam_role.lambda_role.arn
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.9"
-  publish          = true
-  s3_bucket        = var.s3_bucket_name
-  s3_key           = var.s3_key
-  source_code_hash = var.source_code_hash
-
+  file_name        = "../lambda_function.zip"
 
   environment {
     variables = {
       ENV = "production"
     }
   }
-}
-
-# Alias para a versão publicada mais recente
-resource "aws_lambda_alias" "my_lambda_alias" {
-  name            = "live"
-  function_name   = aws_lambda_function.my_lambda.function_name
-  function_version = aws_lambda_function.my_lambda.version
-}
-
-output "lambda_function_arn" {
-  value = aws_lambda_function.my_lambda.arn
 }
