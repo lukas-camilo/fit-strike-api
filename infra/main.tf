@@ -2,18 +2,13 @@ provider "aws" {
   region = var.aws_region
 }
 
-# Criar o bucket S3
-resource "aws_s3_bucket" "lambda_bucket" {
-  bucket = var.s3_bucket_name
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
-
-  tags = {
-    Name        = "LambdaBucket"
-    Environment = "Production"
+terraform {
+  required_version = ">= 0.12"
+  backend "s3" {
+    bucket  = "terraform-state-bucket-lucas"
+    key     = "terraform-fit-strike.tfstate"
+    region  = "us-east-1"
+    encrypt = true
   }
 }
 
@@ -47,7 +42,7 @@ resource "aws_lambda_function" "my_lambda" {
   handler          = "lambda_function.lambda_handler"
   runtime          = "python3.9"
   publish          = true
-  s3_bucket        = aws_s3_bucket.lambda_bucket.id
+  s3_bucket        = var.s3_bucket_name
   s3_key           = var.s3_key
 
   environment {
