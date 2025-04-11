@@ -43,7 +43,7 @@ jobs:
       # 6. Criar o bucket S3 (se ainda não existir)
       - name: Create S3 Bucket
         run: |
-          aws s3api create-bucket --bucket fit-strike-bucket --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
+          aws s3api create-bucket --bucket fit-strike-bucket --region ${{ secrets.AWS_REGION }}
 
       # 7. Fazer upload do código para o bucket S3
       - name: Upload Lambda Code to S3
