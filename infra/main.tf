@@ -49,7 +49,6 @@ resource "aws_lambda_function" "my_lambda" {
   publish          = true
   s3_bucket        = aws_s3_bucket.lambda_bucket.id
   s3_key           = var.s3_key
-  source_code_hash = filebase64sha256(var.lambda_zip_path)
 
   environment {
     variables = {
