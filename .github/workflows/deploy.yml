@@ -47,6 +47,10 @@ jobs:
         run: |
           aws lambda update-function-code --function-name fit-strike-api --zip-file fileb://lambda_function.zip
 
+      - name: Wati for Lambda Update
+        run: |
+          aws lambda wait function-updated --function-name fit-strike-api
+
       - name: Version Lambda
         run: |
           aws lambda publish-version --function-name fit-strike-api
