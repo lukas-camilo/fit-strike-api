@@ -44,7 +44,7 @@ resource "aws_lambda_function" "my_lambda" {
   publish          = true
   s3_bucket        = var.s3_bucket_name
   s3_key           = var.s3_key
-  source_code_hash = filebase64sha256("lambda_function.zip") # Atualize o hash aqui
+  source_code_hash = var.source_code_hash
 
 
   environment {

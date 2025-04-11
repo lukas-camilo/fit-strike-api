@@ -18,3 +18,8 @@ variable "lambda_zip_path" {
   description = "Path to the Lambda zip file"
   type        = string
 }
+
+variable "source_code_hash" {
+  description = "Hash do código fonte da Lambda"
+  type        = string
+}
