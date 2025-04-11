@@ -40,25 +40,35 @@ jobs:
           zip -r ../lambda_function.zip .
           cd ..
 
-      # 6. Configurar Terraform
+      # 6. Criar o bucket S3 (se ainda não existir)
+      - name: Create S3 Bucket
+        run: |
+          aws s3api create-bucket --bucket fit-strike-bucket --region ${{ secrets.AWS_REGION }} --create-bucket-configuration LocationConstraint=${{ secrets.AWS_REGION }}
+
+      # 7. Fazer upload do código para o bucket S3
+      - name: Upload Lambda Code to S3
+        run: |
+          aws s3 cp lambda_function.zip s3://fit-strike-bucket/lambda_function.zip
+
+      # 8. Configurar Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
 
-      # 7. Inicializar Terraform
+      # 9. Inicializar Terraform
       - name: Initialize Terraform
         run: |
           cd infra
           terraform init
 
-      # 8. Planejar Terraform
+      # 10. Planejar Terraform
       - name: Plan Terraform
         run: |
           cd infra
           terraform plan
 
-      # 9. Aplicar Terraform
+      # 11. Aplicar Terraform
       - name: Apply Terraform
         run: |
           cd infra
