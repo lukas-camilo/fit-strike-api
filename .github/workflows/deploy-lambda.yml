@@ -1,48 +1,68 @@
-name: Deploy Lambda
+name: Deploy Lambda with S3 Bucket
 
 on:
-  repository_dispatch:
-    types: [deploy-lambda]
+  push:
+    branches:
+      - main
 
 jobs:
   deploy:
-    name: Deploy Lambda to AWS
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout do código
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # 1. Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # 2. Configurar o AWS CLI
-    - name: Configure AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+      # 2. Configurar AWS CLI
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    # 3. Instalar dependências na pasta package
-    - name: Install dependencies
-      run: |
-        mkdir package
-        pip install -r app/requirements.txt -t package/
+      # 3. Instalar dependências na pasta package
+      - name: Install dependencies
+        run: |
+          mkdir package
+          pip install -r app/requirements.txt -t package/
 
-    # 4. Copiar o código-fonte para a pasta package
-    - name: Copy source code
-      run: |
-        cp -r app/* package/
+      # 4. Copiar o código-fonte para a pasta package
+      - name: Copy source code
+        run: |
+          cp -r app/* package/
 
-    # 5. Empacotar o código e dependências
-    - name: Package Lambda
-      run: |
-        cd package
-        zip -r ../lambda_function.zip .
-        cd ..
+      # 5. Empacotar o código e dependências
+      - name: Package Lambda
+        run: |
+          cd package
+          zip -r ../lambda_function.zip .
+          cd ..
 
-    # 6. Fazer o deploy da Lambda
-    - name: Deploy Lambda
-      run: |
-        aws lambda update-function-code \
-          --function-name fit-strike-api \
-          --zip-file fileb://lambda_function.zip
+      # 6. Configurar Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      # 7. Inicializar Terraform
+      - name: Initialize Terraform
+        run: |
+          cd infra
+          terraform init
+
+      # 8. Planejar Terraform
+      - name: Plan Terraform
+        run: |
+          cd infra
+          terraform plan
+
+      # 9. Aplicar Terraform
+      - name: Apply Terraform
+        run: |
+          cd infra
+          terraform apply -auto-approve
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

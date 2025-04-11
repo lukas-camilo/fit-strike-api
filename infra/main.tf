@@ -2,20 +2,24 @@ provider "aws" {
   region = var.aws_region
 }
 
-terraform {
-  required_version = ">= 0.12"
-  backend "s3" {
-    bucket  = "terraform-state-bucket-lucas"
-    key     = "terraform.tfstate"
-    region  = "us-east-1"
-    encrypt = true
+# Criar o bucket S3
+resource "aws_s3_bucket" "lambda_bucket" {
+  bucket = var.s3_bucket_name
+  acl    = "private"
+
+  versioning {
+    enabled = true
+  }
+
+  tags = {
+    Name        = "LambdaBucket"
+    Environment = "Production"
   }
 }
 
 # Role para a Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "lambda_execution_role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -31,41 +35,36 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 # Política para a Role
-resource "aws_iam_role_policy" "lambda_policy" {
-  name   = "lambda_policy"
-  role   = aws_iam_role.lambda_role.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Effect   = "Allow"
-        Resource = "arn:aws:logs:*:*:*"
-      }
-    ]
-  })
+resource "aws_iam_role_policy_attachment" "lambda_policy" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Função Lambda
+# Função Lambda com versionamento
 resource "aws_lambda_function" "my_lambda" {
-  function_name = "fit-strike-api"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "lambda_function.lambda_handler" # Formato: <arquivo>.<função>
-  runtime       = "python3.9" # Substitua pela versão do Python desejada
-  filename      = "lambda_function.zip" # Arquivo zip da função Lambda
-  source_code_hash = filebase64sha256("lambda_function.zip")
+  function_name    = "fit-strike-api"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.9"
+  publish          = true
+  s3_bucket        = aws_s3_bucket.lambda_bucket.id
+  s3_key           = var.s3_key
+  source_code_hash = filebase64sha256(var.lambda_zip_path)
+
   environment {
     variables = {
-      ENV_VAR = "value" # Substitua por variáveis de ambiente necessárias
+      ENV = "production"
     }
   }
 }
 
-# Output para integração com o workflow
-output "lambda_function_name" {
-  value = aws_lambda_function.my_lambda.function_name
+# Alias para a versão publicada mais recente
+resource "aws_lambda_alias" "my_lambda_alias" {
+  name            = "live"
+  function_name   = aws_lambda_function.my_lambda.function_name
+  function_version = aws_lambda_function.my_lambda.version
+}
+
+output "lambda_function_arn" {
+  value = aws_lambda_function.my_lambda.arn
 }
