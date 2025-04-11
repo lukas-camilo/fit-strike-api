@@ -1,9 +1,8 @@
 name: Deploy Lambda
 
 on:
-  push:
-    branches:
-      - main  # Executa o deploy ao fazer push na branch main
+  repository_dispatch:
+    types: [deploy-lambda]
 
 jobs:
   deploy:
