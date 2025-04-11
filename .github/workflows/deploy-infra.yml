@@ -31,15 +31,21 @@ jobs:
 
     # 4. Inicializar Terraform
     - name: Initialize Terraform
-      run: terraform init
+      run: |
+        cd infra
+        terraform init
 
     # 5. Planejar Terraform
     - name: Plan Terraform
-      run: terraform plan
+      run: |
+        cd infra
+        terraform plan
 
     # 6. Aplicar Terraform
     - name: Apply Terraform
-      run: terraform apply -auto-approve
+      run: |
+        cd infra
+        terraform apply -auto-approve
 
     # 7. Acionar o workflow de deploy da Lambda
     - name: Trigger Lambda Deploy Workflow
