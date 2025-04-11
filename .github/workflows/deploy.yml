@@ -45,7 +45,7 @@ jobs:
 
       - name: Deploy Lambda
         run: |
-          aws lambda update-function-code ==function-name fit-strike-api --zip-file fileb://lambda_function.zip
+          aws lambda update-function-code --function-name fit-strike-api --zip-file fileb://lambda_function.zip
 
       - name: Version Lambda
         run: |
