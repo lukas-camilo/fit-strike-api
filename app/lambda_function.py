@@ -18,5 +18,5 @@ register_product_routes(app)
 @tracer.capture_lambda_handler
 def lambda_handler(event, context):
     """Main Lambda handler"""
-    logger.info("Start")
+    logger.info("Start 2")
     return app.resolve(event, context)
