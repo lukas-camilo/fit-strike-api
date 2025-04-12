@@ -30,22 +30,57 @@ resource "aws_iam_role" "lambda_role" {
 }
 
 # Política para a Role
-resource "aws_iam_role_policy_attachment" "lambda_policy" {
-  role       = aws_iam_role.lambda_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+resource "aws_iam_role_policy" "dynamodb_policy" {
+  name = "lambda_dynamodb_policy"
+  role = aws_iam_role.lambda_role.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Effect   = "Allow"
+        Resource = aws_dynamodb_table.users_table.arn
+      }
+    ]
+  })
+}
+
+# Tabela DynamoDB
+resource "aws_dynamodb_table" "users_table" {
+  name           = "users"
+  billing_mode   = "PAY_PER_REQUEST" # Modo de pagamento por demanda
+  hash_key       = "id"             # Chave primária
+
+  attribute {
+    name = "id"
+    type = "S" # Tipo de dado: String
+  }
+
+  tags = {
+    Environment = "Production"
+    Name        = "UsersTable"
+  }
 }
 
 # Função Lambda com versionamento
 resource "aws_lambda_function" "my_lambda" {
-  function_name    = var.lambda_name
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "lambda_function.lambda_handler"
-  runtime          = "python3.9"
-  filename        = "../lambda_function.zip"
+  function_name = var.lambda_name
+  role          = aws_iam_role.lambda_role.arn
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.9"
+  filename      = "../lambda_function.zip"
 
   environment {
     variables = {
-      ENV = "production"
+      ENV          = "production"
+      DYNAMODB_TABLE = aws_dynamodb_table.users_table.name
     }
   }
 }
