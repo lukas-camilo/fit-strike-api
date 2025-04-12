@@ -5,11 +5,11 @@ from aws_lambda_powertools.logging import Logger
 from aws_lambda_powertools.tracing import Tracer
 from aws_lambda_powertools.metrics import Metrics, MetricUnit
 from src.domain.entities.product import Product
-from src.application.use_cases.create_product import create_product
-from src.application.use_cases.get_product import get_product
-from src.application.use_cases.update_product import update_product
-from src.application.use_cases.delete_product import delete_product
-from src.application.use_cases.list_products import list_products
+from src.application.use_cases.product.create_product import create_product
+from src.application.use_cases.product.get_product import get_product
+from src.application.use_cases.product.update_product import update_product
+from src.application.use_cases.product.delete_product import delete_product
+from src.application.use_cases.product.list_products import list_products
 from src.infrastructure.repositories.product_repository import ProductRepository
 
 # Initialize Powertools utilities
