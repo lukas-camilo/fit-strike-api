@@ -90,5 +90,5 @@ resource "aws_lambda_permission" "api_gateway" {
   action = "lambda:InvokeFunction"
   function_name = aws_lambda_function.my_lambda.function_name
   principal = "apigateway.amazonaws.com"
-  source_arn = "arn:aws:apigateway:us-east-1::/restapis/ci5c5xo9vd"
+  source_arn = "arn:aws:apigateway:us-east-1::/restapis/q28uzvnoj1/*/*"
 }
