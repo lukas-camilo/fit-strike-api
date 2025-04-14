@@ -31,7 +31,7 @@ create_user_schema = {
 
 def register_user_routes(app: APIGatewayRestResolver):
     @tracer.capture_method
-    @app.post("/user")
+    @app.post("/users")
     def create_user():
         event: APIGatewayProxyEvent = app.current_event
         data = event.json_body
@@ -46,4 +46,13 @@ def register_user_routes(app: APIGatewayRestResolver):
             body={
                 "message": "User created successfully"
             }
+        )
+
+    @tracer.capture_method
+    @app.get("/users")
+    def get_users():
+        return Response(
+            status_code=200,
+            content_type="application/json",
+            body=[]
         )
