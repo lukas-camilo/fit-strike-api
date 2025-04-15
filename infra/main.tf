@@ -90,6 +90,6 @@ resource "aws_lambda_permission" "api_gateway" {
   action = "lambda:InvokeFunction"
   function_name = aws_lambda_function.my_lambda.function_name
   principal = "apigateway.amazonaws.com"
-  source_arn = "arn:aws:execute-api:us-east-1:911167911476:9s76sfoujb/*/*"
+  source_arn = "arn:aws:execute-api:us-east-1:911167911476:nlz4x0ioa4/*/*"
   depends_on = [aws_lambda_function.my_lambda]
 }
