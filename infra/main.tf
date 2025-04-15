@@ -91,4 +91,5 @@ resource "aws_lambda_permission" "api_gateway" {
   function_name = aws_lambda_function.my_lambda.function_name
   principal = "apigateway.amazonaws.com"
   source_arn = "arn:aws:apigateway:us-east-1::/restapis/9s76sfoujb/*/*"
+  depends_on = [aws_lambda_function.my_lambda]
 }
