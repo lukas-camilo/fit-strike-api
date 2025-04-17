@@ -54,16 +54,14 @@ def register_user_routes(app: APIGatewayRestResolver):
                 }
             )
         except SchemaValidationError as e:
-            missing_fields = [error.path for error in e.context]
             return Response(
-                status_code=400,
-                content_type="application/json",
-                body={
-                    "message": "Invalid input data",
-                    "missing_fields": missing_fields,
-                    "error": str(e)
-                }
-            )
+            status_code=400,
+            content_type="application/json",
+            body={
+                "message": "Invalid input data",
+                "error": str(e)
+            }
+        )
 
     @tracer.capture_method
     @app.get("/users")
