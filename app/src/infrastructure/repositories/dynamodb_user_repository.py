@@ -1,12 +1,11 @@
-from typing import Tuple, List, Optional
-
 import boto3
 
 from src.application.repository.user_repository import UserRepository
 from src.domain.entities.user import User
-
+from typing import Tuple, List, Optional
 
 class DynamoDBUserRepository(UserRepository):
+
     def __init__(self):
         self.table_name = "users"
         self.dynamodb = boto3.resource('dynamodb')
@@ -21,7 +20,7 @@ class DynamoDBUserRepository(UserRepository):
             }
         )
 
-    def get_users_paginated(self, limit: int, last_evaluated_key=None) -> Tuple[List[User], Optional[dict]]:
+    def get_users(self, limit: int, last_evaluated_key=None) -> Tuple[List[User], Optional[dict]]:
         scan_kwargs = {
             'Limit': limit
         }
