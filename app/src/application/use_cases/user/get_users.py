@@ -9,4 +9,4 @@ class GetUsersUseCase:
         self.user_repository = user_repository
 
     def execute(self, limit: int, last_evaluated_key=None) -> Tuple[List[User], Optional[dict]]:
-        self.user_repository.get_users(limit=limit, last_evaluated_key=last_evaluated_key)
+        return self.user_repository.get_users(limit=limit, last_evaluated_key=last_evaluated_key)
